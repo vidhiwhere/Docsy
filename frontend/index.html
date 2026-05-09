@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Docsy — Internal Docs Q&A Agent</title>
+  <meta name="description" content="Docsy is an AI-powered internal documentation assistant. Ask questions about your internal docs and get instant, contextual answers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <span class="logo-text">Docsy</span>
+      </div>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#" class="nav-item active" data-view="query" id="nav-query">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        Ask Docsy
+      </a>
+      <a href="#" class="nav-item" data-view="upload" id="nav-upload">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+          <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+        </svg>
+        Upload Docs
+      </a>
+      <a href="#" class="nav-item" data-view="documents" id="nav-documents">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+        </svg>
+        Documents
+      </a>
+      <a href="#" class="nav-item" data-view="dashboard" id="nav-dashboard">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Dashboard
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="mode-badge" id="modeBadge">
+        <span class="mode-dot"></span>
+        <span id="modeLabel">Loading…</span>
+      </div>
+      <p class="sidebar-tagline">Powered by semantic search</p>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-wrapper">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="topbar-title" id="topbarTitle">Ask Docsy</div>
+      <div class="topbar-actions">
+        <div class="status-indicator" id="statusIndicator">
+          <span class="status-dot online"></span>
+          <span>API Online</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- View: Query -->
+    <section class="view active" id="view-query">
+      <div class="query-hero">
+        <div class="hero-glow"></div>
+        <h1 class="hero-title">Ask your docs anything.</h1>
+        <p class="hero-subtitle">Docsy searches across all indexed documents and returns precise, contextual answers with source references.</p>
+      </div>
+
+      <form class="query-form" id="queryForm">
+        <div class="query-input-wrapper">
+          <svg class="query-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input
+            type="text"
+            id="queryInput"
+            class="query-input"
+            placeholder="How do I deploy the backend service?"
+            autocomplete="off"
+            maxlength="1000"
+          />
+          <button type="submit" class="query-btn" id="queryBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="query-suggestions">
+          <span class="suggestion-label">Try asking:</span>
+          <button type="button" class="suggestion-chip" data-q="How do I set up the development environment?">Setup guide</button>
+          <button type="button" class="suggestion-chip" data-q="What are the API endpoints available?">API endpoints</button>
+          <button type="button" class="suggestion-chip" data-q="How do I deploy to production?">Deployment steps</button>
+        </div>
+      </form>
+
+      <!-- Answer area -->
+      <div class="answer-section" id="answerSection" style="display:none">
+        <div class="answer-card" id="answerCard">
+          <div class="answer-header">
+            <div class="answer-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2z"/>
+                <path d="M12 8v4l3 3"/>
+              </svg>
+            </div>
+            <span class="answer-label">Docsy's Answer</span>
+            <button class="copy-btn" id="copyBtn" title="Copy answer">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+          <div class="answer-text" id="answerText"></div>
+        </div>
+
+        <div class="sources-section" id="sourcesSection">
+          <h3 class="sources-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            Sources
+          </h3>
+          <div class="sources-grid" id="sourcesGrid"></div>
+        </div>
+      </div>
+
+      <!-- Loading skeleton -->
+      <div class="loading-state" id="loadingState" style="display:none">
+        <div class="thinking-indicator">
+          <div class="thinking-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <span class="thinking-text">Docsy is thinking…</span>
+        </div>
+        <div class="skeleton-card">
+          <div class="skeleton-line long"></div>
+          <div class="skeleton-line medium"></div>
+          <div class="skeleton-line short"></div>
+        </div>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="queryEmptyState">
+        <div class="empty-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            <line x1="11" y1="8" x2="11" y2="11"/><circle cx="11" cy="14" r="0.5" fill="currentColor"/>
+          </svg>
+        </div>
+        <p>Ask a question to get started.<br/>Upload documents first if you haven't yet.</p>
+      </div>
+    </section>
+
+    <!-- View: Upload -->
+    <section class="view" id="view-upload">
+      <div class="view-header">
+        <h2 class="view-title">Upload Documents</h2>
+        <p class="view-desc">Add Markdown, PDF, DOCX, or TXT files to your knowledge base. Docsy will parse and index them automatically.</p>
+      </div>
+
+      <div class="upload-zone" id="uploadZone">
+        <div class="upload-zone-inner">
+          <div class="upload-zone-icon">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+              <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+            </svg>
+          </div>
+          <p class="upload-zone-text"><strong>Drag & drop files here</strong><br/>or click to browse</p>
+          <p class="upload-zone-hint">Supported: .pdf, .docx, .md, .txt &nbsp;|&nbsp; No size limit</p>
+          <input type="file" id="fileInput" multiple accept=".pdf,.docx,.md,.markdown,.txt" style="display:none" />
+          <button class="btn-secondary" id="browseBtn">Browse Files</button>
+        </div>
+      </div>
+
+      <div class="upload-list" id="uploadList" style="display:none">
+        <h3 class="upload-list-title">Upload Queue</h3>
+        <div id="uploadItems"></div>
+        <button class="btn-primary" id="startUploadBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/>
+            <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+          </svg>
+          Upload & Index
+        </button>
+      </div>
+
+      <div class="upload-results" id="uploadResults" style="display:none"></div>
+    </section>
+
+    <!-- View: Documents -->
+    <section class="view" id="view-documents">
+      <div class="view-header">
+        <h2 class="view-title">Knowledge Base</h2>
+        <p class="view-desc">All indexed documents. You can delete documents to remove them from the search index.</p>
+      </div>
+      <div class="docs-toolbar">
+        <div class="search-filter">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="docSearch" placeholder="Filter documents…" />
+        </div>
+        <button class="btn-secondary small" id="refreshDocs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+          </svg>
+          Refresh
+        </button>
+      </div>
+      <div class="docs-grid" id="docsGrid">
+        <div class="docs-loading">Loading documents…</div>
+      </div>
+    </section>
+
+    <!-- View: Dashboard -->
+    <section class="view" id="view-dashboard">
+      <div class="view-header">
+        <h2 class="view-title">Dashboard</h2>
+        <p class="view-desc">Overview of your Docsy knowledge base and usage analytics.</p>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card" id="stat-docs">
+          <div class="stat-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="statDocs">—</div>
+            <div class="stat-label">Documents</div>
+          </div>
+        </div>
+        <div class="stat-card" id="stat-chunks">
+          <div class="stat-icon purple">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="statChunks">—</div>
+            <div class="stat-label">Index Vectors</div>
+          </div>
+        </div>
+        <div class="stat-card" id="stat-queries">
+          <div class="stat-icon green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="statQueries">—</div>
+            <div class="stat-label">Total Queries</div>
+          </div>
+        </div>
+        <div class="stat-card" id="stat-today">
+          <div class="stat-icon orange">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value" id="statToday">—</div>
+            <div class="stat-label">Queries Today</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashboard-bottom">
+        <div class="recent-card">
+          <h3 class="recent-title">Recent Queries</h3>
+          <ul class="recent-list" id="recentList">
+            <li class="recent-empty">No queries yet.</li>
+          </ul>
+        </div>
+        <div class="tips-card">
+          <h3 class="recent-title">💡 Tips</h3>
+          <ul class="tips-list">
+            <li>Ask full questions for best results</li>
+            <li>Upload all related docs together</li>
+            <li>Use OpenAI mode for LLM-generated answers</li>
+            <li>Delete and re-upload docs after major edits</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /main-wrapper -->
+
+  <!-- Toast notifications -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/query.js"></script>
+  <script src="js/upload.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
