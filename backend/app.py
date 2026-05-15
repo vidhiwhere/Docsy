@@ -19,7 +19,7 @@ from modules.indexer import (
 )
 from modules.parser import parse_file, file_hash
 from modules.embedder import get_embeddings
-from modules.qa_engine import answer_query
+from modules.qa_engine import answer_query, summarize_document
 
 app = Flask(__name__)
 CORS(app)
@@ -137,6 +137,15 @@ def query():
 def documents():
     docs = list_documents()
     return jsonify({"documents": docs})
+
+
+@app.route("/api/summarize/<int:doc_id>", methods=["GET", "POST"])
+def summarize(doc_id: int):
+    try:
+        result = summarize_document(doc_id)
+        return jsonify(result)
+    except Exception as e:
+        return _error(f"Summarization failed: {str(e)}", 500)
 
 
 @app.route("/api/documents/<int:doc_id>", methods=["DELETE"])

@@ -5,7 +5,7 @@ Uses OpenAI GPT for generation if NLP_MODE=openai, else returns raw chunks.
 
 from config import NLP_MODE, OPENAI_API_KEY, OPENAI_CHAT, TOP_K
 from modules.embedder import get_embeddings
-from modules.indexer import search, log_query
+from modules.indexer import search, log_query, get_chunks_for_doc
 
 
 SYSTEM_PROMPT = """You are Docsy, an intelligent documentation assistant.
@@ -57,6 +57,38 @@ def answer_query(question: str) -> dict:
         "sources": sources,
         "mode": NLP_MODE,
     }
+
+
+def summarize_document(doc_id: int) -> dict:
+    chunks = get_chunks_for_doc(doc_id)
+    if not chunks:
+        return {"summary": "Document has no text or could not be found."}
+
+    # Limit to first ~5000 chars to avoid hitting token limits for large docs
+    full_text = "\n\n".join(c["text"] for c in chunks)[:5000]
+
+    if NLP_MODE == "openai":
+        from openai import OpenAI
+        client = OpenAI(api_key=OPENAI_API_KEY)
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant. Summarize the following document content concisely in 2-4 paragraphs. Highlight the key takeaways."},
+            {"role": "user", "content": f"Document content:\n{full_text}"},
+        ]
+        try:
+            response = client.chat.completions.create(
+                model=OPENAI_CHAT,
+                messages=messages,
+                temperature=0.3,
+                max_tokens=500,
+            )
+            summary = response.choices[0].message.content.strip()
+        except Exception as e:
+            summary = f"Summarization failed: {str(e)}"
+    else:
+        # Local fallback just returns the beginning of the text
+        summary = "*(OpenAI Mode is disabled. Here is an excerpt from the beginning of the document instead of a full summary:)*\n\n" + full_text[:800] + "..."
+
+    return {"summary": summary}
 
 
 # ---------------------------------------------------------------------------

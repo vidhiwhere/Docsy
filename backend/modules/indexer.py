@@ -178,6 +178,15 @@ def list_documents() -> list[dict]:
         return [dict(r) for r in rows]
 
 
+def get_chunks_for_doc(doc_id: int) -> list[dict]:
+    with _get_conn() as conn:
+        rows = conn.execute(
+            "SELECT text, page, chunk_index FROM chunks WHERE doc_id = ? ORDER BY chunk_index",
+            (doc_id,)
+        ).fetchall()
+        return [dict(r) for r in rows]
+
+
 def delete_document(doc_id: int):
     """
     Remove document and its chunks from SQLite.

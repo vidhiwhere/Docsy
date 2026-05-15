@@ -97,6 +97,9 @@ function filterDocs(query) {
         <span>${formatDate(doc.created_at)}</span>
       </div>
       <div class="doc-actions">
+        <button class="btn-secondary small btn-summarize" data-id="${doc.id}" data-name="${escapeHtml(doc.filename)}">
+          Summarize
+        </button>
         <button class="btn-delete" data-id="${doc.id}" data-name="${escapeHtml(doc.filename)}">
           Delete
         </button>
@@ -108,6 +111,24 @@ function filterDocs(query) {
   grid.querySelectorAll(".btn-delete").forEach(btn => {
     btn.addEventListener("click", () => confirmDelete(btn.dataset.id, btn.dataset.name));
   });
+
+  grid.querySelectorAll(".btn-summarize").forEach(btn => {
+    btn.addEventListener("click", () => summarizeDoc(btn.dataset.id, btn.dataset.name));
+  });
+}
+
+async function summarizeDoc(id, name) {
+  window.showToast(`Summarizing "${name}"...`, "info");
+  try {
+    const res = await fetch(`${window.API}/summarize/${id}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Summarization failed");
+    
+    // Show summary in a modal or alert
+    alert(`Summary for ${name}:\n\n${data.summary}`);
+  } catch (err) {
+    window.showToast("Could not summarize: " + err.message, "error");
+  }
 }
 
 async function confirmDelete(id, name) {
